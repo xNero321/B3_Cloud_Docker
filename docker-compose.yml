@@ -17,12 +17,39 @@ services:
        - db
      image: wordpress:latest
      ports:
-       - "8000:80"
+       - "8000:8000"
      restart: always
      environment:
        WORDPRESS_DB_HOST: db:3306
        WORDPRESS_DB_USER: wordpress
        WORDPRESS_DB_PASSWORD: wordpress
        WORDPRESS_DB_NAME: wordpress
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wordpress.rule=Host(`lesite`)"
+      - "traefik.http.routers.wordpress.entrypoints=web"
+
+   traefik:
+    image: "traefik:v2.0.0-rc3"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+   whoami:
+    image: "containous/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`lesite`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
 volumes:
     db_data: {}
