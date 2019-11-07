@@ -1,55 +1,104 @@
 version: '3.3'
 
 services:
-   db:
-     image: mysql:5.7
-     volumes:
-       - db_data:/var/lib/mysql
-     restart: always
-     environment:
-       MYSQL_ROOT_PASSWORD: somewordpress
-       MYSQL_DATABASE: wordpress
-       MYSQL_USER: wordpress
-       MYSQL_PASSWORD: wordpress
+  db:
+    container_name: db
+    image: mysql:5.7
+    volumes:
+     - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
 
-   wordpress:
-     depends_on:
-       - db
-     image: wordpress:latest
-     ports:
-       - "8000:8000"
-     restart: always
-     environment:
-       WORDPRESS_DB_HOST: db:3306
-       WORDPRESS_DB_USER: wordpress
-       WORDPRESS_DB_PASSWORD: wordpress
-       WORDPRESS_DB_NAME: wordpress
-     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.wordpress.rule=Host(`lesite`)"
-      - "traefik.http.routers.wordpress.entrypoints=web"
-
-   traefik:
-    image: "traefik:v2.0.0-rc3"
-    container_name: "traefik"
-    command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+  wordpress:
+    depends_on:
+     - db
+    container_name: wordpress
+    image: wordpress:latest
     ports:
-      - "80:80"
+     - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /wordpress"
+      traefik.port: "8000"
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    labels:
+      - "traefik.http.routers.portainer.rule=Host(`portainer.docker.localhost`)"
+
+  gitlab:
+    container_name: gitlab
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com:8929'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+    ports:
+      - '8929:8929'
+      - '2224:22'
+    labels:
+      - "traefik.http.routers.gitlab.rule=Host(`gitlab.docker.localhost`)"
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+
+  traefik:
+    container_name: traefik
+    image: traefik:v2.0
+    command: --api.insecure=true --providers.docker
+    ports:
       - "8080:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock
 
-   whoami:
-    image: "containous/whoami"
-    container_name: "simple-service"
+   wordpress:
+    depends_on:
+     - db
+    container_name: wordpress
+    image: wordpress:latest
+    ports:
+     - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`lesite`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /wordpress"
+      traefik.port: "8000"
+
+     traefik:
+    container_name: traefik
+    image: traefik:v2.0
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
     db_data: {}
+    portainer_data:
