@@ -13,6 +13,19 @@ services:
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
 
+  sonarqube:
+    container_name: sonarqube
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "9090:9090"
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /sonarqube"
+      traefik.port: "9090"
+   
   wordpress:
     depends_on:
      - db
