@@ -55,7 +55,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     labels:
-      - "traefik.http.routers.portainer.rule=Host(`portainer.docker.localhost`)"
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /portainer"
+      traefik.port: "9000"
 
   gitlab:
     container_name: gitlab
@@ -69,12 +71,14 @@ services:
     ports:
       - '8929:8929'
       - '2224:22'
-    labels:
-      - "traefik.http.routers.gitlab.rule=Host(`gitlab.docker.localhost`)"
     volumes:
       - '/srv/gitlab/config:/etc/gitlab'
       - '/srv/gitlab/logs:/var/log/gitlab'
       - '/srv/gitlab/data:/var/opt/gitlab'
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /gitlab"
+      traefik.port: "8929"
 
   traefik:
     container_name: traefik
@@ -82,17 +86,14 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
       - "8080:8080"
+      - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /traefik"
+      traefik.port: "8080"
 
-  traefik:
-    container_name: traefik
-    image: traefik:v2.0
-    command: --api.insecure=true --providers.docker
-    ports:
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
     db_data: {}
