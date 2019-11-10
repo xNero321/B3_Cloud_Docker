@@ -14,14 +14,14 @@ ________________________________
 ## Usage
 
     1. docker-compose up
-It will pull both wordpress and mySQL image in order to initialize the container.
+It will pull all the required images in order to initialize the containers.
 
     2. docker-compose down
-In order to stop the current container it will down every instance of this container.
+In order to stop the current containers it will down every instance of these containers.
 
     3. docker-composer down --volumes
    
-This command will unmount every volumes used for this container and make the instance back to scratch.
+This command will unmount every volumes used for these containers and make the instance back to scratch.
 ________________________________
 
 ## Environnement variables
