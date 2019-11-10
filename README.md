@@ -91,8 +91,52 @@ It allow us to process incoming network request over HTTP and serveral other pro
 
 
 ### Docker Management / IaaC
+
+As a docker management solution, we deployed Portainer which allows us to monitor everything that happend in docker:
+
+- Containers
+- Volumes
+- Stacks
+- images
+- Services
+
+Portainer is a lightweight management UI which allows us to easily manage different docker environnements (Docker hosts, swarm clusters, etc ...).
+
+For our IaaC, we are using Ansible, it's an open-source software provisionning, configuration management and application-deployement tool. The principal goals of this solution is to : 
+
+- Manage system who shouldn't impose additional dependenvies on the environement => **Minimal**
+- Be able to create consistent environments. => **Consistent**
+- Does not deploy agent to node. => **Secure**
+- Prevent unexpected side-effects tof the managed system. => **Highly reliable**
+- Playsbooks use an easy descriptive configuration language based on YAML which makes easier to write playbook. => **Minimal learning required**
+
 ### Reverse proxy
+
+The solution for publishhing our services easier is using Traefin, it's an *Edge Router* that automatically discovers the right configuration for our services. It happen when Trafeik inspects our infrastructure, where it find revelant information and discovers which service serves which request. The benefits of a reverse proxy are listed as so :
+
+- Dynamic Port Binding
+- Dynamic Routing
+- Enable load balancing and failover
+- Create a single point of access to your FTS
+- Simplifies access control tasks
+- Reduce risks to sensitive data
+
+This solution will be efficient whenever someone wants to add a new service to the operational stack
+
 ### Work services
 
+The work services are composed of 2 different element :
+
+#### Gitlab
+
+Gitlab is an open source git-repository to store projects and manage it as your wish. it's a solution that most of the active developper use nowadays because of his efficiency and the fact that is secure which ssh connexion.
+
+Gitlab also have an integrated CI **(Continious Integration)** which is a usefull toool.
+Continuous Integration is a development practice that require developers to integrate code into a shared repository serveral times a day. Each check-in is then vertified by an automated build, allowing teams to detect problems early.
+
+By integrating regularly, you can detect errors quickly, and locate them more easily.
 
 
+#### SonarQube
+
+For our second work service, we integrated SonarQube, it's an open-source platform for continuous ispection of code quality to perform automatic reviews with static analysis of code to detect bugs, code smells and security vulnerabilities. SonarQube supported more than 20+ programming language and it provides full automated analysis and integration with: (Maven, Ant, Gradle, MSBuild and continuous integration tools like Jenkins, Bamboo, Hudson, etc ...)
