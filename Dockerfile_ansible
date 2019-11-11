@@ -1,0 +1,14 @@
+FROM ubuntu:latest
+RUN apt-get update
+RUN apt-get install -y python3
+RUN apt install -y software-properties-common
+RUN apt-add-repository --yes --update ppa:ansible/ansible
+RUN apt -y install ansible
+RUN echo 172.18.0.8 >> /etc/ansible/hosts
+RUN echo 172.18.0.6 >> /etc/ansible/hosts
+RUN echo 172.18.0.5 >> /etc/ansible/hosts
+RUN echo 172.18.0.4 >> /etc/ansible/hosts
+RUN echo 172.18.0.3 >> /etc/ansible/hosts
+RUN echo 172.18.0.2 >> /etc/ansible/hosts
+RUN cat /etc/ansible/hosts
+CMD ansible all -a "/bin/echo hello"

@@ -13,10 +13,19 @@ services:
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
 
+  ansible:
+    container_name: ansible
+    build:
+      dockerfile: Dockerfile_ansible
+      context: .
+    restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.rule: "PathPrefix: /ansible"
   sonarqube:
     container_name: sonarqube
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_sonarqube
       context: .
     restart: always
     ports:
