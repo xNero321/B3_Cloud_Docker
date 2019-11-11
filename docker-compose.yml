@@ -22,6 +22,7 @@ services:
     labels:
       traefik.enable: "true"
       traefik.frontend.rule: "PathPrefix: /ansible"
+  
   sonarqube:
     container_name: sonarqube
     build:
